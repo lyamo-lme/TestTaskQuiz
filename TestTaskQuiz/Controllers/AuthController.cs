@@ -8,4 +8,5 @@ public class AuthController : Controller
     public AuthController()
     {
     }
+    
 }
