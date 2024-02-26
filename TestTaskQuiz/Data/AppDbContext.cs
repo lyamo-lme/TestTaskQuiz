@@ -4,9 +4,9 @@ using TestTaskQuiz.Models;
 
 namespace TestTaskQuiz.Data;
 
-public class AppContext:DbContext
+public class AppDbContext:DbContext
 {
-    public AppContext(DbContextOptions<AppContext> options) : base(options)
+    public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
     {
     }
     protected override void OnModelCreating(ModelBuilder modelBuilder)
