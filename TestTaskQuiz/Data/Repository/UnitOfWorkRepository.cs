@@ -1,8 +1,8 @@
 using TestTaskQuiz.Core.Data;
 
-namespace TestTaskQuiz.Data;
+namespace TestTaskQuiz.Data.Repository;
 
-public class UnitOfWorkRepository : IUnitOfWorkRepository, IDisposable
+public class UnitOfWorkRepository : IUnitOfWorkRepository
 {
     private readonly ILogger<UnitOfWorkRepository>? _logger;
     private readonly AppDbContext _forumDbContext;
@@ -24,9 +24,9 @@ public class UnitOfWorkRepository : IUnitOfWorkRepository, IDisposable
         _forumDbContext = forumDbContext;
     }
 
-    public void Dispose()
+    public async Task DisposeAsync()
     {
-        _forumDbContext.Dispose();
+        await _forumDbContext.DisposeAsync();
     }
 
     public IRepository<T> GenericRepository<T>() where T : class
@@ -57,5 +57,10 @@ public class UnitOfWorkRepository : IUnitOfWorkRepository, IDisposable
             _logger.Log(LogLevel.Critical, e, e.Message);
             throw;
         }
+    }
+
+    public void Dispose()
+    {
+        _forumDbContext.Dispose();
     }
 }

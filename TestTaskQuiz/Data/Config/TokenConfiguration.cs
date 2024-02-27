@@ -9,7 +9,7 @@ public class TokenConfiguration : IEntityTypeConfiguration<Token>
     public void Configure(EntityTypeBuilder<Token> builder)
     {
         builder.Property(prop => prop.UserId).IsRequired();
-        
+        builder.HasKey(prop => prop.Id);
         builder.HasOne<User>(prop => prop.User)
             .WithMany(prop => prop.Tokens)
             .HasForeignKey(prop => prop.UserId);
