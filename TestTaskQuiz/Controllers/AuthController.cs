@@ -55,8 +55,10 @@ public class AuthController : Controller
             var tokens = new JwtResponse()
             {
                 AccessToken = _jwtTokenGenerator.GenerateJwtToken(authClaims, 10 * 60),
-                RefreshToken = refreshToken
+                RefreshToken = refreshToken,
+                User = new UserDto(user)
             };
+            
             return Ok(tokens);
         }
         catch (Exception e)
@@ -87,13 +89,6 @@ public class AuthController : Controller
             _logger.LogError(e.Message);
             return BadRequest("Something bad :/");
         }
-    }
-
-    [HttpGet]
-    [Authorize]
-    public async Task<IActionResult> CheckAuth()
-    {
-        return Ok();
     }
 
     [HttpPost]
@@ -131,5 +126,12 @@ public class AuthController : Controller
             _logger.LogError(e.Message);
             return BadRequest("Something bad :/");
         }
+    }
+
+    [HttpPost]
+    [Route("logout")]
+    public async Task<IActionResult> Logout()
+    {
+        throw new NotImplementedException();
     }
 }

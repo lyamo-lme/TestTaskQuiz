@@ -1,0 +1,7 @@
+.nav-menu > ul{
+    display: flex;
+}
+.nav-menu > ul>li{
+    padding-right: 15px;
+    list-style: none;
+}

@@ -1,9 +1,8 @@
 using System.Text;
+using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
-using Microsoft.OpenApi.Models;
-using Microsoft.VisualBasic;
 using TestTaskQuiz.Core.Data;
 using TestTaskQuiz.Core.Services;
 using TestTaskQuiz.Data;
@@ -11,13 +10,14 @@ using TestTaskQuiz.Data.Repository;
 using TestTaskQuiz.Extensions;
 using TestTaskQuiz.Models.AuthModels;
 using TestTaskQuiz.Service;
+using Microsoft.Extensions.DependencyInjection;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 var jwtConfiguration = builder.Configuration.GetSection("Jwt").Get<JwtConfiguration>();
 
-builder.Services.AddControllers();
+builder.Services.AddControllers().AddNewtonsoftJson();
 
 builder.Services.AddDbContext<AppDbContext>((options) =>
 {
@@ -51,6 +51,16 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJw
     options.SaveToken = true;
 });
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("DefaultPolicy",
+        option => option.WithOrigins("http://localhost:3000")
+            .AllowAnyHeader()
+            .AllowAnyMethod()
+            .AllowCredentials()
+            .SetIsOriginAllowed((host) => true));
+});
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -60,7 +70,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-
+app.UseCors("DefaultPolicy");
 app.UseHttpsRedirection();
 
 app.UseAuthentication();
