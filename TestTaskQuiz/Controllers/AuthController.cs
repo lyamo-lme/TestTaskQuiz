@@ -127,11 +127,4 @@ public class AuthController : Controller
             return BadRequest("Something bad :/");
         }
     }
-
-    [HttpPost]
-    [Route("logout")]
-    public async Task<IActionResult> Logout()
-    {
-        throw new NotImplementedException();
-    }
 }
