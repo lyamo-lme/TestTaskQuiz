@@ -10,10 +10,6 @@ public class TestQuestionsConfiguration : IEntityTypeConfiguration<TestQuestion>
     {
         builder.HasKey(key => key.Id);
 
-        builder.HasOne<QuestionAnswer>(prop => prop.CorrectAnswer)
-            .WithOne(prop => prop.TestQuestion)
-            .HasForeignKey<QuestionAnswer>(key => key.QuestionId);
-
         builder.HasMany<QuestionAnswer>(prop => prop.QuestionAnswers)
             .WithOne(prop => prop.TestQuestion)
             .HasForeignKey(key => key.QuestionId);

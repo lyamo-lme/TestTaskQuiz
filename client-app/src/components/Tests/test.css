@@ -1,0 +1,26 @@
+.test-list {
+    display: flex;
+    justify-content: center;
+}
+
+.test-ent {
+    display: flex;
+    width: 80%;
+    justify-content: space-evenly
+}
+
+.test-name{
+    padding: 5px;
+    text-align: left;
+}
+.test-question{
+    padding-left: 15px;
+    text-align: left;
+}
+.answer-option{
+    background-color: rgba(9, 239, 99, 0.15);;
+    padding: 7px;
+    border-radius: 15px;
+    margin: 25px 5px 5px 25px ;
+    border: #2ea44f 2px solid;
+}

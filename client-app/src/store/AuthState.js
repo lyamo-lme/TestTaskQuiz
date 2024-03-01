@@ -1,5 +1,6 @@
 import {AuthService} from "../service/AuthService";
 import {makeAutoObservable} from "mobx"
+import {accessTokenKey, getCookie, refreshTokenKey} from "../helpers/cookie";
 
 export default class AuthStore {
     isAuth = false;
@@ -7,6 +8,20 @@ export default class AuthStore {
 
     constructor() {
         makeAutoObservable(this);
+    }
+
+    async refresh() {
+        try {
+            if (getCookie(refreshTokenKey))
+                return;
+            let data = await AuthService.refresh();
+            console.log(data)
+            this.isAuth = true;
+            this.user = data.user;
+            console.log(this)
+        } catch (e) {
+            console.log(e.response);
+        }
     }
 
     async login(email, password) {

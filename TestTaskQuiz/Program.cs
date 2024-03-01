@@ -11,14 +11,17 @@ using TestTaskQuiz.Extensions;
 using TestTaskQuiz.Models.AuthModels;
 using TestTaskQuiz.Service;
 using Microsoft.Extensions.DependencyInjection;
+using Newtonsoft.Json;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 var jwtConfiguration = builder.Configuration.GetSection("Jwt").Get<JwtConfiguration>();
 
-builder.Services.AddControllers().AddNewtonsoftJson();
-
+builder.Services.AddControllers().AddNewtonsoftJson(options =>
+{
+    options.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
+});
 builder.Services.AddDbContext<AppDbContext>((options) =>
 {
     options.UseInMemoryDatabase("Quiz");

@@ -8,7 +8,7 @@ public interface IRepository<TEntity> where TEntity : class
         Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>>? orderBy = null, int? take = null, int? skip = null,
         string includeProperties = "");
 
-    public Task<TEntity?> FindAsync(Expression<Func<TEntity, bool>> func, string? include = null);
+    public Task<TEntity?> FindAsync(Expression<Func<TEntity, bool>> func, string[]? relatedData=null);
     public ValueTask<TEntity> CreateAsync(TEntity model);
     public Task<bool> DeleteAsync(TEntity entity);
     public ValueTask<TEntity> UpdateAsync(TEntity model);

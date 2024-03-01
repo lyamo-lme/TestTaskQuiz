@@ -58,14 +58,17 @@ public class GenericRepository<TEntity> : IRepository<TEntity> where TEntity : c
         }
     }
 
-    public async Task<TEntity?> FindAsync(Expression<Func<TEntity, bool>> func, string? relatedData = null)
+    public async Task<TEntity?> FindAsync(Expression<Func<TEntity, bool>> func, string[]? relatedData)
     {
         try
         {
             IQueryable<TEntity> query = _entity;
             if (relatedData != null)
             {
-                query = query.Include(relatedData);
+                foreach (var relatedEntity in relatedData)
+                {
+                    query = query.Include(relatedEntity);
+                }
             }
 
             return await query.FirstOrDefaultAsync(func);

@@ -1,5 +1,5 @@
 import axios from "axios";
-import {accessTokenKey, getCookie} from "../helpers/cookie";
+import {accessTokenKey, getCookie, refreshTokenKey, setCookie} from "../helpers/cookie";
 import {apiRoutes} from "../helpers/routesStrings";
 
 export const apiHttp = axios.create({
@@ -13,4 +13,20 @@ apiHttp.interceptors.request.use((config) => {
         config.headers.Authorization = `Bearer ${getCookie(accessTokenKey)}`;
     }
     return config;
+});
+
+
+apiHttp.interceptors.response.use((config) => {
+    return config;
+}, async (error) => {
+    const request = error.config;
+    if (error.response.status == 401) {
+        const response = await axios.post(apiRoutes.refreshToken, {
+            token: getCookie(refreshTokenKey)
+        });
+        setCookie(accessTokenKey, response.data.accessToken);
+        setCookie(refreshTokenKey, response.data.refreshToken);
+
+        return apiHttp.request(request);
+    }
 });

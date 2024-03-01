@@ -58,7 +58,7 @@ public class AuthController : Controller
                 RefreshToken = refreshToken,
                 User = new UserDto(user)
             };
-            
+
             return Ok(tokens);
         }
         catch (Exception e)
@@ -93,14 +93,15 @@ public class AuthController : Controller
 
     [HttpPost]
     [Route("refresh")]
-    public async Task<IActionResult> RefreshTokens(string token)
+    public async Task<IActionResult> RefreshTokens([FromBody] string token)
     {
         try
         {
             using var uowRepository = _uowRepository;
             var tokenRepository = uowRepository.GenericRepository<Token>();
             var oldToken =
-                await tokenRepository.FindAsync(obj => obj.RefreshToken.Equals(token), $"{nameof(Token.User)}");
+                await tokenRepository.FindAsync(obj => obj.RefreshToken.Equals(token),
+                    new[] { $"{nameof(Token.User)}" });
             if (oldToken?.User == null)
             {
                 return BadRequest("Token is not valid");
@@ -118,7 +119,8 @@ public class AuthController : Controller
             return Ok(new JwtResponse()
             {
                 AccessToken = _jwtTokenGenerator.GenerateJwtToken(authClaims, 10 * 60),
-                RefreshToken = refreshToken
+                RefreshToken = refreshToken,
+                User = new UserDto(oldToken.User)
             });
         }
         catch (Exception e)

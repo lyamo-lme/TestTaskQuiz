@@ -4,20 +4,18 @@ using TestTaskQuiz.Models;
 
 namespace TestTaskQuiz.Data.Config;
 
-public class UsersTestConfiguration
-    : IEntityTypeConfiguration<UsersTest>
+public class UserTestAttemptConfiguration : IEntityTypeConfiguration<UserTestAttempt>
 {
-    public void Configure(EntityTypeBuilder<UsersTest> builder)
+    public void Configure(EntityTypeBuilder<UserTestAttempt> builder)
     {
-        builder.HasKey(prop => prop.UserId);
-        builder.HasKey(prop => prop.TestId);
+        builder.HasKey(prop => prop.Id);
 
         builder.HasOne<Test>(prop => prop.Test)
-            .WithMany(prop => prop.UsersTests)
+            .WithMany(prop => prop.UserTestAttempts)
             .HasForeignKey(key => key.TestId);
 
         builder.HasOne<User>(prop => prop.User)
-            .WithMany(prop => prop.UsersTests)
+            .WithMany(prop => prop.UserTestAttempts)
             .HasForeignKey(key => key.UserId);
     }
 }
