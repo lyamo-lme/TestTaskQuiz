@@ -30,3 +30,12 @@ apiHttp.interceptors.response.use((config) => {
         return apiHttp.request(request);
     }
 });
+
+
+let defaultProps = {
+    counters: [
+        {id: 1, initial: 6, min: -5, max: 10},
+        {id: 2, initial: 5, min: -10, max: 20},
+        {id: 3, initial: 0, min: -100, max: 100},
+    ],
+};
