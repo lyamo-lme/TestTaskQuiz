@@ -12,7 +12,15 @@ import {ProtectedRoute} from "./components/ProtectedRoute/ProtectedRoute";
 
 function App() {
     const {authStore} = useContext(Context);
+    const navigate = useNavigate();
 
+    useEffect(() => {
+        console.log("refresh")
+        try {
+            authStore.refresh().then(() => navigate("/"));
+        } catch {
+        }
+    }, []);
     return (
         <div className="App">
             <Header/>

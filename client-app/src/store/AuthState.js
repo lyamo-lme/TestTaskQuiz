@@ -12,8 +12,9 @@ export default class AuthStore {
 
     async refresh() {
         try {
-            if (getCookie(refreshTokenKey))
+            if (!getCookie(refreshTokenKey)) {
                 return;
+            }
             let data = await AuthService.refresh();
             console.log(data)
             this.isAuth = true;
@@ -30,7 +31,7 @@ export default class AuthStore {
             console.log(data)
             this.isAuth = true;
             this.user = data.user;
-            console.log(this)
+            return data;
         } catch (e) {
             console.log(e.response);
         }

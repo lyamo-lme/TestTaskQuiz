@@ -20,6 +20,7 @@ const Tests = observer(() => {
         <div className={"test-list"} key={test.id}>
             <div className={"test-ent"}>
                 <p>{test.testName}</p>
+                <p>{test.correctAnswers==null?"wait time expire or pass test":`Result ${test.correctAnswers}  of ${test.countQuestions}`}</p>
                 <button className={"button-3"} onClick={() => navigate(`/test/${test.id}`)}>Pass test</button>
             </div>
         </div>;

@@ -9,6 +9,9 @@ export class AuthService {
         return apiHttp.post(apiRoutes.login, {
             email, password
         }).then(response => {
+            if(response.data===undefined){
+                throw  new Error("");
+            }
             let data = response.data;
             setCookie(accessTokenKey, data.accessToken);
             setCookie(refreshTokenKey, data.refreshToken);
@@ -18,8 +21,14 @@ export class AuthService {
 
     static async refresh() {
         return apiHttp.post(apiRoutes.refreshToken, {
-            refreshToken: getCookie(refreshTokenKey)
+            token: getCookie(refreshTokenKey)
         }).then(response => {
+            if(response.data===undefined){
+                throw  new Error("");
+            }
+            // if (!response.config.validateStatus(200)) {
+            //     throw new Error("token expire");
+            // }
             let data = response.data;
             setCookie(accessTokenKey, data.accessToken);
             setCookie(refreshTokenKey, data.refreshToken);
@@ -30,7 +39,5 @@ export class AuthService {
     static async logout() {
         clearCookie(accessTokenKey);
         clearCookie(refreshTokenKey);
-        return apiHttp.post(apiRoutes.logout);
-
     }
 }

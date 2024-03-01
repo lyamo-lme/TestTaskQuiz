@@ -4,12 +4,14 @@ import {TestService} from "../service/TestService";
 export default class TestStore {
     userTests = null;
     currentAttempt = null;
+    access = true;
 
     constructor() {
         makeAutoObservable(this);
     }
 
     async getUsersTests(userId) {
+        this.access =true;
         return TestService.getUsersTests(userId).then(data => {
             try {
                 this.userTests = data;
@@ -21,23 +23,29 @@ export default class TestStore {
     }
 
     async beginAttempt(userId, testId) {
-        return TestService.beginAttempt(userId, testId).then(data => {
-            try {
+        try {
+            return TestService.beginAttempt(userId, testId).then((data) => {
+                if (data === null) {
+                    this.access = false;
+                    return;
+                }
                 this.currentAttempt = data;
-                console.log(data)
                 return data;
-            } catch (e) {
-                console.log(e);
-            }
-        });
-
+            });
+        } catch (e) {
+            console.log(e);
+        }
     }
 
     async choseAnswer(userId, answerId) {
+        this.access =true;
+        console.log(userId)
+        console.log(answerId)
         return TestService.choseAnswer(userId, answerId).then(data => {
             try {
-                this.currentAttempt = data;
-                console.log(data)
+                if(data==null){
+                    this.access = false;
+                }
                 return data;
             } catch (e) {
                 console.log(e);

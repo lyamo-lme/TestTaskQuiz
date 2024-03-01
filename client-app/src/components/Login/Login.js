@@ -1,13 +1,17 @@
 import {useContext, useState} from "react";
 import {Context} from "../../store/context";
 import {observer} from "mobx-react-lite";
+import './login.css';
+import {useNavigate} from "react-router-dom";
+
 
 const Login = () => {
+    const navigate = useNavigate();
     const [LoginClaims, setLoginClaims] = useState({password: '', email: ''});
     const Login = (e) => {
         e.preventDefault();
         console.log(email);
-        authStore.login(email, password);
+        authStore.login(email, password).then((data => navigate("/")));
     };
     const {authStore} = useContext(Context);
 

@@ -2,6 +2,7 @@ using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using TestTaskQuiz.Core.Data;
 using TestTaskQuiz.Models;
+using TestTaskQuiz.Models.ApiDto.Request;
 using TestTaskQuiz.Models.ApiDto.Test;
 using TestTaskQuiz.Models.ApiDto.Test.ForUser;
 using TestTaskQuiz.Service;
@@ -67,14 +68,14 @@ public class TestController : Controller
                         .GetAsync(x => x.TestId == test.Id)).Count();
                     test.CountQuestions = testAnswersCount;
                     test.CorrectAnswers = answerIds.Any() ? correctUserAnswers : null;
+                  
                 }
             }
             catch (Exception e)
             {
                 Console.WriteLine(e);
             }
-
-
+            
             return Ok(tests);
         }
         catch (Exception e)
@@ -86,23 +87,53 @@ public class TestController : Controller
 
     [HttpPost]
     [Route("answer")]
-    public async Task<IActionResult> AddAnswer(UsersAnswers usersAnswers)
+    public async Task<IActionResult> AddAnswer(UsersAnswersApiDto usersAnswers)
     {
         try
         {
-            if (await _uowRepository
-                    .GenericRepository<UsersAnswers>()
-                    .FindAsync(x => x.AnswerId == usersAnswers.AnswerId && x.UserId == usersAnswers.UserId) != null)
+            var answer = await _uowRepository
+                .GenericRepository<QuestionAnswer>()
+                .FindAsync(x => x.Id == usersAnswers.AnswerId, new[]
+                {
+                    $"{nameof(QuestionAnswer.TestQuestion)}"
+                });
+            var testId = answer.TestQuestion.TestId;
+            var question = await _uowRepository.GenericRepository<TestQuestion>().FindAsync(x => x.TestId == testId);
+            var userAnswer = await _uowRepository
+                .GenericRepository<UsersAnswers>()
+                .FindAsync(x => x.QuestionAnswer.QuestionId == question.Id && x.UserId == usersAnswers.UserId);
+            if (userAnswer != null)
             {
-                return BadRequest("have answer");
+                var userTestAttempt =
+                    await _uowRepository
+                        .GenericRepository<UserTestAttempt>()
+                        .FindAsync(x => x.Test.Id == testId,
+                            new[]
+                            {
+                                $"{nameof(UserTestAttempt.Test)}"
+                            }
+                        );
+             
+                await _uowRepository.GenericRepository<UsersAnswers>().UpdateAsync(
+                    new UsersAnswers()
+                    {
+                        UserId = usersAnswers.UserId,
+                        AnswerId = usersAnswers.AnswerId
+                    }
+                );
+                await _uowRepository.SaveAsync();
+                return Ok("answer changed");
+            }
+            else
+            {
+                await _uowRepository.GenericRepository<UsersAnswers>().CreateAsync(new UsersAnswers()
+                {
+                    UserId = usersAnswers.UserId,
+                    AnswerId = usersAnswers.AnswerId
+                });
+                await _uowRepository.SaveAsync();
             }
 
-            await _uowRepository.GenericRepository<UsersAnswers>().CreateAsync(new UsersAnswers()
-            {
-                UserId = usersAnswers.UserId,
-                AnswerId = usersAnswers.AnswerId
-            });
-            await _uowRepository.SaveAsync();
             return Ok();
         }
         catch (Exception e)
@@ -114,10 +145,10 @@ public class TestController : Controller
 
     [HttpPost]
     [Route("user")]
-    public async Task<IActionResult> AddUserToTest(UsersTest usersTest)
-    { 
+    public async Task<IActionResult> AddUserToTest(UsersTestApiDto usersTest)
+    {
         try
-        {  
+        {
             await _uowRepository
                 .GenericRepository<UsersTest>()
                 .CreateAsync(new UsersTest
@@ -137,7 +168,7 @@ public class TestController : Controller
 
     [HttpPost]
     [Route("attempt")]
-    public async Task<IActionResult> BeginAttempt(UserTestAttempt usersTest)
+    public async Task<IActionResult> BeginAttempt(UsersTestApiDto usersTest)
     {
         try
         {
@@ -158,12 +189,14 @@ public class TestController : Controller
 
             var attempt = await _uowRepository
                 .GenericRepository<UserTestAttempt>()
-                .FindAsync(test => test.TestId == usersTest.TestId, new[]
+                .FindAsync(test => test.TestId == usersTest.TestId
+                                   && test.UserId == usersTest.UserId, new[]
                 {
                     $"{nameof(UserTestAttempt.Test)}" +
                     $".{nameof(Test.TestQuestions)}" +
                     $".{nameof(TestQuestion.QuestionAnswers)}"
                 });
+       
 
             return Ok(new
             {

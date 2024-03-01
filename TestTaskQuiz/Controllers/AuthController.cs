@@ -92,15 +92,23 @@ public class AuthController : Controller
     }
 
     [HttpPost]
+    [Authorize]
+    [Route("check")]
+    public async Task<IActionResult> CheckAuth()
+    {
+        return Ok();
+    }
+
+    [HttpPost]
     [Route("refresh")]
-    public async Task<IActionResult> RefreshTokens([FromBody] string token)
+    public async Task<IActionResult> RefreshTokens(RefreshTokenDto token)
     {
         try
         {
             using var uowRepository = _uowRepository;
             var tokenRepository = uowRepository.GenericRepository<Token>();
             var oldToken =
-                await tokenRepository.FindAsync(obj => obj.RefreshToken.Equals(token),
+                await tokenRepository.FindAsync(obj => obj.RefreshToken.Equals(token.Token),
                     new[] { $"{nameof(Token.User)}" });
             if (oldToken?.User == null)
             {

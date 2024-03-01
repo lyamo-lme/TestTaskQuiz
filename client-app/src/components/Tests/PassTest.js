@@ -10,14 +10,30 @@ const PassTest = observer(() => {
     const {testId} = useParams();
     const navigation = useNavigate();
     const {user} = authStore;
-    const {currentAttempt, userTests} = testStore;
+    const {currentAttempt, userTests, access} = testStore;
     const [taskNumber, setTaskNumber] = useState(1);
     useEffect(() => {
-        testStore.beginAttempt(user.id, testId);
+        try {
+            testStore.beginAttempt(user.id, testId);
+        } catch (e) {
+            console.log(e);
+        }
     }, []);
     useEffect(() => {
 
     }, [taskNumber])
+
+    const nextQuestion = () => {
+        let nextQuestionIndex = taskNumber + 1;
+        let countQuestions = JSON.parse(JSON.stringify(userTests)).find(x => x.id == testId).countQuestions;
+
+        if (nextQuestionIndex > countQuestions) {
+            navigation("/");
+            console.log(nextQuestionIndex);
+            return;
+        }
+        setTaskNumber(nextQuestionIndex);
+    }
     const Attempt = () => {
         return currentAttempt != null ? <div>
             <h2 className={"test-name"}>{currentAttempt.test.testName}</h2>
@@ -30,7 +46,10 @@ const PassTest = observer(() => {
                         .testQuestions[taskNumber - 1]
                         .questionAnswer.map((answer =>
                             <div key={answer.id} className={"test-question answer-option"}
-                                 onClick={() => testStore.choseAnswer(user.id, answer.id)}>
+                                 onClick={() => {
+                                     testStore.choseAnswer(user.id, answer.id);
+                                     nextQuestion();
+                                 }}>
                                 {answer.answerText}
                             </div>))}
                 </div>
@@ -42,20 +61,12 @@ const PassTest = observer(() => {
             </button>
             <button className={"button-3"}
                     onClick={() => {
-                        let nextQuestionIndex = taskNumber + 1;
-                        let countQuestions = JSON.parse(JSON.stringify(userTests)).find(x => x.id == testId).countQuestions;;
-                        if (nextQuestionIndex > countQuestions) {
-                            navigation("/");
-                            console.log(nextQuestionIndex);
-                            return;
-                        }
-                        setTaskNumber(nextQuestionIndex);
+                        nextQuestion();
                     }}>Next
             </button>
 
         </div> : "Loading"
     }
-
     return (
         <>
             <div>
